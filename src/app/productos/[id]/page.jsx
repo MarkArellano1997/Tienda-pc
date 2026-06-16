@@ -1,6 +1,7 @@
 import productos from "@/data/productos";
 import Image from "next/image";
 import ProductCard from "@/components/ProductCard";
+import Link from "next/link"
 
 export default async function ProductoDetalle({ params }) {
 
@@ -15,6 +16,11 @@ export default async function ProductoDetalle({ params }) {
 
     return (
         <>
+
+            <Link href="/" className="inline-block mb-6 text-blue-600 hover:underline">
+                ← Volver a Productos
+            </Link>
+
             <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 p-10 items-center">
                 
                 <div>
@@ -55,7 +61,7 @@ export default async function ProductoDetalle({ params }) {
                 
 
             </div>
-
+        
             <div className="max-w-6xl mx-auto p-10">
                 <h2 className="text-2xl font-bold mb-6">
                     Productos relacionados

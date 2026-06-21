@@ -1,4 +1,4 @@
-import productos from "@/data/productos";
+import { supabase } from "@/lib/supabase";
 import Image from "next/image";
 import ProductCard from "@/components/ProductCard";
 import Link from "next/link"
@@ -6,11 +6,22 @@ import Link from "next/link"
 export default async function ProductoDetalle({ params }) {
 
     const { id } = await params;
-    const producto = productos.find((p) => p.id === Number(id));
-    const productosRelacionados = productos.filter((p) =>
-        p.categoria === producto.categoria &&
-        p.id !== producto.id
-    ).slice(0, 3);
+
+    const { data: producto } = await supabase
+    .from("productos")
+    .select("*")
+    .eq("id", Number(id))
+    .single();
+
+    const { data: productosRelacionados } = await supabase
+    .from("productos")
+    .select("*")
+    .eq("categoria", producto.categoria);
+
+    const relacionadosFiltrados = productosRelacionados
+    .filter((p) => p.id !== producto.id)
+    .slice(0, 3);
+    
     const mensaje = `Hola, me interesa el producto: ${producto.nombre}`;
     const whatsappUrl = `https://wa.me/927743420?text=${encodeURIComponent(mensaje)}`;
 
@@ -44,11 +55,13 @@ export default async function ProductoDetalle({ params }) {
                         S/.{producto.precio}
                     </p>
                     <p>{producto.descripcion}</p>
-                    {producto.caracteristicas.map((item)=>(
-                        <li key={item}>
+                    <ul>
+                        {producto.caracteristicas.split(",").map((item) => (
+                            <li key={item}>
                             ✓ {item}
-                        </li>
-                    ))}
+                            </li>
+                        ))}
+                    </ul>
                     <a
                         href={whatsappUrl}
                         target="_blank"
@@ -69,7 +82,7 @@ export default async function ProductoDetalle({ params }) {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {
-                        productosRelacionados.map((item)=>(
+                        relacionadosFiltrados.map((item)=>(
                             <ProductCard 
                                 key={item.id}
                                 producto={item}

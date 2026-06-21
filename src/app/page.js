@@ -1,9 +1,9 @@
 "use client";
 
-import {useState} from "react"
+import {useState, useEffect} from "react"
+import {supabase} from "../lib/supabase"
 import Image from "next/image";
 import ProductCard from "../components/ProductCard";
-import productos from "../data/productos"
 import Hero from "../components/Hero"
 import Navbar from "../components/Navbar"
 import Footer from "../components/Footer"
@@ -15,6 +15,22 @@ export default function Home() {
 
   const [categoria, setCategoria] = useState("Todos");
   const [busqueda, setBusqueda] = useState("");
+  const [productos, setProductos] = useState([]);
+
+  useEffect(() => {
+  const obtenerProductos = async () => {
+    const { data, error } = await supabase
+      .from("productos")
+      .select("*");
+
+    if (error) {
+        console.error(error);
+      } else {
+        setProductos(data);
+      }
+    };
+    obtenerProductos();
+  }, []);
 
   const categorias = [
     "Todos",

@@ -5,7 +5,7 @@ import Link from "next/link"
 
 export default async function ProductoDetalle({ params }) {
 
-    const { id } = await params;
+    const { id } = params;
 
     const { data: producto } = await supabase
     .from("productos")
@@ -13,12 +13,16 @@ export default async function ProductoDetalle({ params }) {
     .eq("id", Number(id))
     .single();
 
+    if (!producto) {
+        return <div>Producto no encontrado</div>;
+    }
+
     const { data: productosRelacionados } = await supabase
     .from("productos")
     .select("*")
     .eq("categoria", producto.categoria);
 
-    const relacionadosFiltrados = productosRelacionados
+    const relacionadosFiltrados = (productosRelacionados || [])
     .filter((p) => p.id !== producto.id)
     .slice(0, 3);
     
@@ -56,10 +60,12 @@ export default async function ProductoDetalle({ params }) {
                     </p>
                     <p>{producto.descripcion}</p>
                     <ul>
-                        {producto.caracteristicas.split(",").map((item) => (
-                            <li key={item}>
-                            ✓ {item}
-                            </li>
+                        {(producto.caracteristicas || "")
+                            .split(",")
+                            .map((item) => (
+                                <li key={item}>
+                                    ✓ {item}
+                                </li>
                         ))}
                     </ul>
                     <a
